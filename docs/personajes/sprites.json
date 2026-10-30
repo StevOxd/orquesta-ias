@@ -1,0 +1,98 @@
+{
+  "formato": "Cada sprite usa el formato de Phaser textures.generate: 'data' es una lista de filas, cada carácter es una clave de 'paleta' y '.' es transparente.",
+  "personajes": [
+    {
+      "id": "pinzas",
+      "nombre": "Pinzas",
+      "familia": "claude",
+      "estado": "aprobado",
+      "paleta": {
+        "o": "#E07B53",
+        "O": "#B8573A",
+        "l": "#F5A47F",
+        "w": "#FFFFFF",
+        "k": "#2A1A14"
+      },
+      "data": [
+        "................",
+        "oo.oo......oo.oo",
+        "oo.oo......oo.oo",
+        "ooooo......ooooo",
+        ".ooo........ooo.",
+        "..oo.ww..ww.oo..",
+        "...o.wk..wk.o...",
+        "...o..O..O..o...",
+        "..oooooooooooo..",
+        ".ollooooooooooo.",
+        ".oloooooooooooo.",
+        ".oooooooooooooo.",
+        "..OooooooooooO..",
+        "...OOOOOOOOOO...",
+        "..O.O.O..O.O.O..",
+        ".O.O.O....O.O.O."
+      ]
+    },
+    {
+      "id": "chispa",
+      "nombre": "Chispa",
+      "familia": "gemini",
+      "estado": "aprobado",
+      "paleta": {
+        "a": "#4F8EF7",
+        "b": "#6C7BF2",
+        "c": "#8C6FE6",
+        "d": "#A66BD6",
+        "h": "#DDE8FF",
+        "k": "#1C1640"
+      },
+      "data": [
+        ".......a........",
+        ".......a........",
+        "......haa.......",
+        "......hab.......",
+        ".....aabbb......",
+        "....aabbbcc.....",
+        "..ahakbbckcdd...",
+        "aaaabkbcckddddd.",
+        "..abbbcccdddd...",
+        "....bcccddd.....",
+        ".....ccddd......",
+        "......ddd.......",
+        "......ddd.......",
+        ".......d........",
+        ".......d........",
+        "................"
+      ]
+    },
+    {
+      "id": "nudo",
+      "nombre": "Nudo",
+      "familia": "gpt-oss",
+      "estado": "aprobado",
+      "paleta": {
+        "k": "#2B2D31",
+        "w": "#F3F4F6",
+        "g": "#9AA1AB",
+        "t": "#19A68A"
+      },
+      "data": [
+        ".....tt..tt.....",
+        ".......tt.......",
+        ".......kk.......",
+        ".....kkwwkk.....",
+        "...kkwwggwwkk...",
+        ".kkwwggwwggwwkk.",
+        ".kwwgwwwwwwgwwk.",
+        ".kwwgwkwwkwgwwk.",
+        ".kwwgwkwwkwgwwk.",
+        ".kwwgwwwwwwgwwk.",
+        ".kwwgwwwwwwgwwk.",
+        ".kwwgwwwwwwgwwk.",
+        ".kkwwggwwggwwkk.",
+        "...kkwwggwwkk...",
+        ".....kkwwkk.....",
+        ".......kk......."
+      ]
+    }
+  ]
+}

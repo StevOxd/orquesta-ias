@@ -1,0 +1,15 @@
+# Dependencias y builds
+node_modules/
+dist/
+
+# Secretos
+.env
+.env.*
+!.env.example
+
+# Datos de trabajo de Orquesta (eventos con salidas de comandos)
+.orquesta/
+
+# Sistema y registros
+.DS_Store
+*.log
