@@ -1,0 +1,23 @@
+{
+  "name": "orquesta-ias",
+  "private": true,
+  "description": "Una empresa de agentes de IA que reparte cada proyecto entre tus suscripciones de Claude y Gemini.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "test": "node --test \"packages/*/test/**/*.test.ts\"",
+    "tipos": "tsc -p tsconfig.json",
+    "sprites": "node scripts/render-sprites.mjs",
+    "humo": "node scripts/humo-ejecutores.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2"
+  }
+}

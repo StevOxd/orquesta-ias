@@ -68,15 +68,16 @@ Los modelos Claude y GPT-OSS que corren dentro de Antigravity gastan la cuota de
 
 - **Claude:** los límites son de la cuenta y se comparten entre la extensión y `claude -p`.
 - **Antigravity (Google AI Pro):** la página de planes, citada en el foro de Google, promete una cuota que se refresca cada 5 horas, más un límite semanal. Entre enero y febrero de 2026 hubo muchos reportes de usuarios con bloqueos de varios días en los modelos Claude y GPT-OSS dentro de Antigravity. Por eso **Claude vía Antigravity se trata como reserva**, no como plan principal.
-- **Cuota restante:** ninguno de los dos CLI la expone (no aparece en `agy --help`). El motor lleva su propia contabilidad con el campo `usage` de cada respuesta y detecta los errores de cuota.
+- **Cuota restante:** Claude sí la reporta. En `stream-json` emite un `rate_limit_event` con el uso de las ventanas de 5 horas y de 7 días y la hora en que se reinicia cada una. `agy` no la expone (no aparece en `agy --help`), así que para Antigravity el motor lleva su propia contabilidad con el campo `usage` de cada respuesta y reconoce los errores de cuota por su texto.
 
 ### 3.4 Comportamiento de `agy -p`
 
 | Prueba | Resultado | Consecuencia para el diseño |
 |---|---|---|
 | Salida redirigida, sin terminal | Funciona, unos 7 s | Se puede llamar desde el motor |
-| `--json-schema` | Devuelve `structured_output` ya parseado | Los artefactos estructurados los valida el propio `agy` |
-| Contexto por stdin | Lo ignora | El ejecutor mete el contenido en el prompt |
+| `--json-schema` | Devuelve `structured_output` ya parseado. Si la salida no cumple el esquema, `agy` la rechaza y el modelo reintenta | Se pueden pedir artefactos estructurados, pero el reintento encarece la llamada: en la prueba de humo, unos 34K tokens de entrada contra 4K de Claude |
+| Texto plano por stdin | Lo ignora | — |
+| Prompt por stdin con `-p= --input-format stream-json` | Acepta `{"event":"user","message":{"role":"user","content":"…"}}` | El ejecutor manda el prompt, con el contenido incluido, por stdin y sin límite de tamaño de argumentos |
 | Leer archivos en `--mode plan` o con `--sandbox` | Bloquea los comandos y responde vacío | Lectura = contenido en el prompt, más `--mode plan` |
 | Leer archivos en `--mode auto` | Una vez funcionó; otra vez se denegó `pwd && ls -la` y respondió vacío | No depender de que `agy` explore solo. Una respuesta vacía se trata como fallo |
 | Costo base | Unos 10K tokens de entrada y entre 3 y 15 s por llamada | No delegar tareas triviales |
@@ -210,7 +211,7 @@ Secciones fijas:
 
 - **Objetivo.**
 - **Alcance:** qué incluye y qué no.
-- **Criterios de aceptación:** `CA-1`, `CA-2`… Cada uno indica cómo se verifica.
+- **Criterios de aceptación:** uno por elemento de lista, con el formato `- CA-1: <qué se cumple>. Verificación: <cómo se comprueba>`.
 - **Riesgos.**
 - **Preguntas abiertas.** Si hay alguna sin responder, la compuerta no pasa. Así se evita que un agente avance con supuestos en vez de preguntar.
 
@@ -358,7 +359,7 @@ El router aplica estas reglas en orden:
 4. Disponibilidad: si una suscripción está "fuera de turno" (tuvo un error de cuota reciente), pasa a la siguiente opción.
 5. Costo mínimo: no se delega a `agy` una tarea trivial, por su costo base de unos 10K tokens.
 
-**Detección de cuota.** En la Fase 0 hay que capturar los mensajes reales de error de cuota de cada CLI. Con eso se marca una suscripción como fuera de turno y se estima cuándo vuelve.
+**Detección de cuota.** Claude avisa en su `rate_limit_event`: cuando el estado deja de ser `allowed`, la suscripción queda fuera de turno hasta la hora de reinicio que trae el mismo evento. Para `agy` todavía hay que capturar un error de cuota real; mientras tanto se reconoce por el texto (`quota`, `rate limit`, `RESOURCE_EXHAUSTED`, `429`).
 
 **Contabilidad.** Cada ejecución registra los tokens de entrada y salida, la duración, el modelo y la suscripción.
 
@@ -398,7 +399,7 @@ Reglas:
 }
 ```
 
-Tipos de evento: `fase_iniciada`, `agente_inicio`, `herramienta`, `mensaje`, `agente_fin`, `error`, `esperando_aprobacion`, `aprobado`, `rechazado`, `fuera_de_turno` y `contratacion`.
+Tipos de evento: `fase_iniciada`, `agente_inicio`, `herramienta`, `mensaje`, `agente_fin`, `error`, `esperando_aprobacion`, `aprobado`, `rechazado`, `fuera_de_turno`, `cuota` y `contratacion`. Los eventos de `cuota` llevan el uso de cada ventana de límite y alimentan los medidores de consumo de la oficina.
 
 ### 11.2 Fuentes de eventos
 
@@ -406,7 +407,7 @@ Tipos de evento: `fase_iniciada`, `agente_inicio`, `herramienta`, `mensaje`, `ag
 |---|---|
 | Motor | Emite directamente los cambios de fase y las compuertas |
 | Ejecutor Antigravity | Traduce el `stream-json` de `agy`: `init` → `agente_inicio`; `step_update` de herramienta en `ACTIVE` → `herramienta`; `ERROR` → `error`; `result` → `agente_fin` con el consumo |
-| Ejecutor Claude | Traduce `claude -p --output-format stream-json`. El formato exacto se confirma en la Fase 0 |
+| Ejecutor Claude | Traduce `claude -p --output-format stream-json --verbose`: `system/init` → `agente_inicio`; `tool_use` → `herramienta`; texto → `mensaje`; `rate_limit_event` → `cuota`; `result` → `agente_fin` con el consumo |
 | Tu sesión en VS Code | Opcional: hooks de Claude Code (`PreToolUse`, `PostToolUse`, `SubagentStop`…) para que tú también aparezcas en la oficina |
 
 ### 11.3 La oficina: La Pecera

@@ -1,0 +1,14 @@
+{
+  "name": "@orquesta/ejecutores",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Adaptadores que corren un rol con claude -p o agy -p y traducen su salida a eventos.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@orquesta/contratos": "0.1.0"
+  }
+}
